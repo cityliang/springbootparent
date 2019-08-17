@@ -1,0 +1,47 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	trimDirectiveWhitespaces="true" pageEncoding="UTF-8"%>
+<%@ include file="/resources/inc/other3.jsp"%>
+<section class="content">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="nav-tabs-custom">
+					<ul class="nav nav-tabs hidden-print">
+						<li class="active"><a href="#sqtx" data-toggle="tab">XXXXX</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="sqtx">
+							<div class="box">
+								<div class="box-body">
+									<table class="table table-bordered table-form">
+										<tbody>
+											<tr>
+										#set ($i=0)
+#foreach($column in $columns)
+    #if($column.columnName != $pk.columnName)
+        #if($i==3)
+            #set($i=0)
+												</tr><tr>
+												#end
+										        <td>${column.comments}</td>
+												<td>
+													${${classname}.${column.attrname}}
+												</td>
+										#set($i=$i+1)
+    #end
+#end
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="hidden-print text-center"
+										style="margin-bottom:7px;margin-top: 14px">
+											<a href="#" class="btn btn-info" onclick="returnList()"><span class="fa fa-mail-reply"></span> 返回</a>
+									</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>

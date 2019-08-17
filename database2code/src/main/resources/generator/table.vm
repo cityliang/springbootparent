@@ -1,0 +1,42 @@
+$(function() {
+$table.bootstrapTable({
+url : url,
+height:getHeight(),
+striped : true,
+search : true,
+showSenior: true,    //高级查询
+showRefresh : true,
+showColumns : true,
+minimumCountColumns : 2,
+queryParams : queryParams,
+clickToSelect : true,
+pagination : true,
+paginationLoop : false,
+sidePagination : 'server',
+silentSort : false,
+smartDisplay : false,
+escape : true,
+searchOnEnterKey : true,
+idField : 'id',
+sortName : 'createdate',
+sortOrder : 'desc',
+maintainSelected : true,
+toolbar : '#toolbar',
+columns : [
+{field : 'ck',checkbox : true},
+{field : 'action',width:'90',title : '操作',align : 'center',formatter : 'actionFormatter',events :
+    'actionEvents',clickToSelect : false},
+#foreach($column in $columns)
+#if($column.columnName != $pk.columnName)
+{field: '${column.attrname}', title: '${column.comments}',formatter :'${column.attrname}Formatter'},
+#end
+#end
+{field : '',title : ''},
+{field : 'createDate',title : '创建时间',formatter : 'timeFormatter'}
+],
+formatSearch: function (){
+return '输入XXXX查询';//代码生成后需要根据情况进行修改
+},
+onDblClickRow:onDblClickRow//双击查看
+});
+});

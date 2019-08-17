@@ -1,0 +1,76 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	trimDirectiveWhitespaces="true" pageEncoding="UTF-8"%>
+<%@ include file="/resources/inc/other3.jsp"%>
+<form method="post" name='form' id="formSubmit" patter="focus">
+<input type="hidden" id="tokens" name="tokens" value="${token}">
+<input type="hidden" id="attachments" name='attachments' value="">
+<input type="hidden" id="id" name="id" value="${${classname}.id}">
+	<section class="content">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="nav-tabs-custom">
+					<ul class="nav nav-tabs hidden-print">
+						<li class="active"><a href="#sqtx" data-toggle="tab">${comments}</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="sqtx">
+							<div class="box">
+								<div class="box-body">
+									<table class="table table-bordered table-form">
+										<tbody>
+											<tr>
+#set ($i=0)
+#foreach($column in $columns)
+    #if($column.columnName != $pk.columnName)
+        #if($i==3)
+            #set($i=0)
+</tr><tr>
+#end
+<td><em class="red">*</em>${column.comments}</td>
+												<td>
+												<input nullable="false"  placeholder="请输入${column.comments}" type="text" class="form-control"
+													id="${column.attrname}" name="${column.attrname}" value="${${classname}.${column.attrname}}">
+												</td>
+										#set($i=$i+1)
+    #end
+#end
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="hidden-print text-center" style="margin-bottom:7px;margin-top: 14px">
+											<a href="#" class="btn btn-info" onclick="saveAction()" verify="true"><span class="fa fa-save"></span> 保存</a>
+											<a href="#" class="btn btn-info" onclick="saveSubmitAction()" verify="true"><span class="glyphicon glyphicon-share"></span> 保存并提交</a>
+											<a href="#" class="btn btn-info" onclick="resetList()"><span class="fa fa-refresh"></span> 重置</a>
+											<a href="#" class="btn btn-info" onclick="returnList()"><span class="fa fa-mail-reply"></span> 返回</a>
+									</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</form>
+<script>
+$(function() {
+	//初始化验证表单
+	window.Verify.init();
+});
+
+function saveAction(){
+	if(Verify.IsPass($("form"))){
+		var id = $("#id").val();
+		if("" != id){
+			formSubmit("${basePath}/${mainPath}/${classname}/update/"+id);
+		}else{
+			formSubmit("${basePath}/${mainPath}/${classname}/create");
+		}
+	}
+}
+function saveSubmitAction(){
+	$("#isfb").val("1");
+	saveAction();
+}
+</script>

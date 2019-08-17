@@ -1,0 +1,8 @@
+{field : 'createDate',title : '创建时间',formatter : 'timeFormatter'}
+],
+formatSearch: function (){
+return '输入XXXX查询';//代码生成后需要根据情况进行修改
+},
+onDblClickRow:onDblClickRow//双击查看
+});
+});

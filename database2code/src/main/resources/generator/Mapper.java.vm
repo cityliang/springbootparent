@@ -1,0 +1,16 @@
+package
+
+    ${package}.${moduleName}.mapper;
+
+import ${package}.${moduleName}.model.${className};
+import org.zhuo.${mainPath}.core.common.mapper.SuperMapper;
+
+/**
+ * ${comments}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${className}Mapper extends SuperMapper<${className}> {
+
+}

@@ -1,0 +1,63 @@
+package ${package}.${moduleName}.model;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.zhuo.${mainPath}.core.common.entity.SuperEntity;
+
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableName;
+import com.xjs.common.dict.DictUtil;
+import com.xjs.common.impExp.annotation.Excel;
+import com.xjs.common.impExp.util.PoiPublicUtil;
+
+#if(${hasBigDecimal})
+import java.math.BigDecimal;
+#end
+
+/**
+ * ${comments}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@SuppressWarnings("serial")
+@TableName("${tableName}")
+public class ${className} extends SuperEntity{
+
+#foreach ($column in $columns)
+    #if($column.columnName != $pk.columnName)
+    /**
+     * $column.comments
+     */
+    @Excel(name = "${column.comments}")
+    @TableField(value = "$column.columnName")
+    private $column.attrType $column.attrname;
+    #end
+#end
+
+#foreach ($column in $columns)
+    #if($column.columnName != $pk.columnName)
+    /**
+     * 设置：${column.comments}
+     */
+    public void set${column.attrName}($column.attrType $column.attrname){
+            this.$column.attrname = $column.attrname;
+            }
+    /**
+     * 获取：${column.comments}
+     */
+    public $column.attrType get${column.attrName}(){
+            return $column.attrname;
+            }
+    #end
+#end
+public Map<String, Object> get${className}Map(){
+        Map<String, String> mapFile=PoiPublicUtil.getClassFieldsDict(this.getClass());
+        Map<String, Object> map=new HashMap<String, Object>();
+    #foreach ($column in $columns)
+            map.put("$column.attrname",DictUtil.toName(mapFile.get("$column.attrname"),this.get${column.attrName}()));
+    #end
+        return map;
+        }
+        }

@@ -26,7 +26,134 @@
     <!-- 依赖统一版本管理 -->
 	<dependencyManagement>
 		<dependencies>
+			<!-- 一个增强的Mybatis工具包，用于简化开发Spring-Boot-Starter -->
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatisplus-spring-boot-starter</artifactId>
+				<version>1.0.5</version>
+			</dependency>
+			<!-- 这是mybatis-plus依赖 -->
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus-boot-starter</artifactId>
+				<version>3.1.2</version>
+			</dependency>
+			<!-- 代码生成器 依赖 MyBatis-Plus 支持 Velocity（默认）、Freemarker、Beetl 模板引擎 -->
+			<!-- 这是mybatis-plus的代码自动生成器 -->
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus-generator</artifactId>
+				<version>3.1.2</version>
+			</dependency>
 
+
+			<!-- 模板引擎相关 -->
+			<!-- Velocity 模板引擎 -->
+			<dependency>
+				<groupId>org.apache.velocity</groupId>
+				<artifactId>velocity-engine-core</artifactId>
+				<version>2.1</version>
+			</dependency>
+			<!-- Beetl 模板引擎 -->
+			<dependency>
+				<groupId>com.ibeetl</groupId>
+				<artifactId>beetl</artifactId>
+				<version>3.0.10.RELEASE</version>
+			</dependency>
+
+			<!-- 数据库相关 -->
+			<!-- JDBC数据源实现 -->
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>druid</artifactId>
+				<version>1.1.11</version>
+			</dependency>
+			<!-- oracle 数据库驱动 -->
+			<dependency>
+				<groupId>com.oracle</groupId>
+				<artifactId>ojdbc6</artifactId>
+				<version>11.2.0.1.0</version>
+			</dependency>
+
+
+			<!-- Apache Commons 库相关 -->
+			<!-- Apache Commons IO库包含实用程序类，流实现，文件过滤器，文件比较器，endian转换类等等 -->
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.6</version>
+			</dependency>
+
+
+			<!-- 导入导出 -->
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi</artifactId>
+				<version>3.15</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml</artifactId>
+				<version>3.15</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml-schemas</artifactId>
+				<version>3.15</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.alibaba.spring.boot</groupId>
+				<artifactId>dubbo-spring-boot-starter</artifactId>
+				<version>2.0.0</version>
+			</dependency>
+			<!-- zookeeper 依赖 -->
+			<dependency>
+				<groupId>org.apache.zookeeper</groupId>
+				<artifactId>zookeeper</artifactId>
+				<version>3.4.8</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<!-- zk 客户端 -->
+			<dependency>
+				<groupId>com.github.sgroschupf</groupId>
+				<artifactId>zkclient</artifactId>
+				<version>0.1</version>
+			</dependency>
+
+
+			<!-- 安全控制相关 -->
+			<dependency>
+				<groupId>org.apache.shiro</groupId>
+				<artifactId>shiro-spring</artifactId>
+				<version>1.4.0</version>
+			</dependency>
+
+
+			<!-- 中文到拼音 支持汉语（简体和繁体）到最流行的拼音系统，包括汉语拼音，通用拼音，Wade-Giles，MPS2，耶鲁和Gwoyeu Romatzyh。支持多种发音和定制输出。 -->
+			<dependency>
+				<groupId>com.belerweb</groupId>
+				<artifactId>pinyin4j</artifactId>
+				<version>2.5.1</version>
+			</dependency>
+
+
+			<!-- Json 相关依赖 -->
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>fastjson</artifactId>
+				<version>1.2.59</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -44,6 +171,177 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
+		<!-- SpringBoot Web 依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!-- SpringBoot jpa 依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<!-- SpringBoot jdbc 依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<!-- 热部署 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<!-- SpringBoot activemq 依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-activemq</artifactId>
+		</dependency>
+
+		<!-- SpringBoot redis 依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<!-- SpringBoot rest 依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-rest</artifactId>
+		</dependency>
+
+		<!--添加jsp依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+		</dependency>
+
+
+		<!--dubbo-springBoot依赖-->
+		<dependency>
+			<groupId>com.alibaba.spring.boot</groupId>
+			<artifactId>dubbo-spring-boot-starter</artifactId>
+		</dependency>
+		<!-- zookeeper 依赖 -->
+		<dependency>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- zk 客户端 -->
+		<dependency>
+			<groupId>com.github.sgroschupf</groupId>
+			<artifactId>zkclient</artifactId>
+		</dependency>
+
+
+		<!-- 安全控制相关 -->
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-spring</artifactId>
+		</dependency>
+
+
+		<!-- 数据库相关 -->
+		<!-- JDBC数据源实现 -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid-spring-boot-starter</artifactId>
+			<version>1.1.18</version>
+		</dependency>
+		<!-- mysql 数据库驱动 -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<!-- oracle 数据库驱动 -->
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+		</dependency>
+
+		<!-- Apache Commons 库相关 -->
+		<!-- Apache Commons对象池库 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+		</dependency>
+		<!-- Apache Commons Lang，一个Java实用程序类包，用于java.lang层次结构中的类，或被认为是标准的，以证明java.lang中的存在 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<!-- Apache Commons IO库包含实用程序类，流实现，文件过滤器，文件比较器，endian转换类等等 -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
+		<!-- 导入导出 -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+		</dependency>
+
+		<!-- 缓存相关 -->
+		<!-- Jedis是一个非常小而且理智的Redis java客户端 -->
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+		</dependency>
+
+
+		<!-- 中文到拼音 支持汉语（简体和繁体）到最流行的拼音系统，包括汉语拼音，通用拼音，Wade-Giles，MPS2，耶鲁和Gwoyeu Romatzyh。支持多种发音和定制输出。 -->
+		<dependency>
+			<groupId>com.belerweb</groupId>
+			<artifactId>pinyin4j</artifactId>
+		</dependency>
+
+
+		<!-- springmvc集成swagger FastDFS客户端 -->
+		<dependency>
+			<groupId>net.oschina.zcx7878</groupId>
+			<artifactId>fastdfs-client-java</artifactId>
+			<version>1.27.0.0</version>
+		</dependency>
+
+		<!-- swagger2 API -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+
+
 		<!-- lombok 依赖 简化 model实体代码 日志注解@Log, @Log4j, @Log4j2, @Slf4j, @XSlf4j @CommonsLog, @JBossLog, @Flogger 不同框架的日志注解 -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

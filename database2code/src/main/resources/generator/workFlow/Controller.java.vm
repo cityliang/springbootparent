@@ -1,0 +1,459 @@
+package
+
+    ${package}.${moduleName}.controller;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.zhuo.${mainPath}.core.common.constant.StateConstant;
+import org.zhuo.${mainPath}.core.common.constant.WorkFlowState;
+import org.zhuo.${mainPath}.core.common.controller.ControlBaseController;
+import ${package}.${moduleName}.model.${className};
+import ${package}.${moduleName}.service.I${className}Service;
+import org.zhuo.workFlow.modules.workFlows.model.ApprovalRecord;
+
+import com.baomidou.mybatisplus.enums.SqlLike;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.xjs.common.date.DateUtil;
+import com.xjs.common.entity.User;
+import com.xjs.common.impExp.excel.ExcelImportUtil;
+import com.xjs.common.impExp.excel.entity.ExportParams;
+import com.xjs.common.impExp.excel.entity.ImportParams;
+import com.xjs.common.impExp.excel.entity.result.ExcelImportResult;
+import com.xjs.common.impExp.util.PoiPublicUtil;
+import com.xjs.common.page.PageResponse;
+import com.xjs.common.token.PreventDuplicateSubmission;
+import org.zhuo.control.core.common.constant.WorkFlowConstant;
+
+/**
+ * ${comments}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Controller
+@Api(value = "${comments}", description = "${comments}")
+@RequestMapping({"/${mainPath}/${classname}"})
+public class ${className}Controller extends CdpfMisBaseController<${className}> {
+    @Autowired
+    private I${className}Service ${classname}Service;
+
+    @RequiresPermissions({"${mainPath}:${classname}"})
+    @RequestMapping(value = {"/index"}, method = {RequestMethod.GET})
+    public String index(String listType, ModelMap modelMap) {
+        modelMap.put("listType", listType);
+        if (WorkFlowState.SAVE.getValue().equals(listType)) {
+            return "/${mainPath}/${moduleName}/${classname}/applayIndex.jsp";
+        } else if (WorkFlowState.SUBMIT.getValue().equals(listType)) {
+            return "/${mainPath}/${moduleName}/${classname}/approvalIndex.jsp";
+        }
+
+        return "/${mainPath}/${moduleName}/${classname}/index.jsp";
+    }
+
+    @ApiOperation(value = "${comments}申请", notes = "获取${comments}申请列表")
+    @ApiImplicitParam(name = "page", value = "分页对象和查询条件page", required = true, dataType = "PageResponse")
+    @RequiresPermissions({"${mainPath}:${classname}:applayList"})
+    @RequestMapping(value = {"/applayList"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public Object applayList(@ModelAttribute PageResponse page,
+                             HttpServletRequest request) {
+        EntityWrapper<${className}> entityWrapper = new EntityWrapper<${className}>();
+        entityWrapper = getParameter(page, entityWrapper, request);
+        entityWrapper.eq("createById", this.getSessionUser().getId());
+        entityWrapper.like("orgCode", this.getSessionUser().getOrgCode(), SqlLike.RIGHT);
+        List<String> strings = getDoingTask();
+        // 查询未提交 和 退回来的申请
+        entityWrapper.andNew("(processinstanceId in(" + strings.toString() + ") and state = '2') or state in('0')");
+        Page<${className}> list = ${classname}Service.selectPage(
+                getPage(page), searchParams(page, entityWrapper));
+        Map<String, Object> result = new HashMap<>();
+        result.put("rows", list.getRecords());
+        result.put("total", list.getTotal());
+        return result;
+    }
+
+    @ApiOperation(value = "${comments}审批", notes = "获取${comments}审批列表")
+    @ApiImplicitParam(name = "page", value = "分页对象和查询条件page", required = true, dataType = "PageResponse")
+    @RequiresPermissions({"${mainPath}:${classname}:approvalList"})
+    @RequestMapping(value = {"/approvalList"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public Object approvalList(@ModelAttribute PageResponse page,
+                               HttpServletRequest request) {
+        EntityWrapper<${className}> entityWrapper = new EntityWrapper<${className}>();
+        entityWrapper = getParameter(page, entityWrapper, request);
+        List<String> strings = getDoingTask();
+        // 查询待办任务
+        entityWrapper.eq("state", "1");
+        entityWrapper.in("processinstanceId", strings);
+        entityWrapper.like("orgCode", this.getSessionUser().getOrgCode(), SqlLike.RIGHT);
+        Page<${className}> list = ${classname}Service.selectPage(
+                getPage(page), searchParams(page, entityWrapper));
+        Map<String, Object> result = new HashMap<>();
+        result.put("rows", list.getRecords());
+        result.put("total", list.getTotal());
+        return result;
+    }
+
+    @ApiOperation(value = "${comments}查询", notes = "获取${comments}查询列表")
+    @ApiImplicitParam(name = "page", value = "分页对象和查询条件page", required = true, dataType = "PageResponse")
+    @RequiresPermissions({"${mainPath}:${classname}:selectList"})
+    @RequestMapping(value = {"/selectList"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public Object selectList(@ModelAttribute PageResponse page,
+                             HttpServletRequest request) {
+        EntityWrapper<${className}> entityWrapper = new EntityWrapper<${className}>();
+        entityWrapper = getParameter(page, entityWrapper, request);
+        // 查询未提交
+        Page<${className}> list = ${classname}Service.selectPage(
+                getPage(page), searchParams(page, entityWrapper));
+        Map<String, Object> result = new HashMap<>();
+        result.put("rows", list.getRecords());
+        result.put("total", list.getTotal());
+        return result;
+    }
+
+    // 供列表和导出查询条件
+    private EntityWrapper<${className}> getParameter(PageResponse page,
+                                                     EntityWrapper<${className}> entityWrapper,
+                                                     HttpServletRequest request) {
+        // entityWrapper.like("unitname", page.getParameter()).or()
+        // .like("ssex", page.getParameter());
+        entityWrapper.like("unitname", page.getParameter());
+        return entityWrapper;
+    }
+
+    /**
+     * 公用执行方法
+     *
+     * @param kffwJgglErtyd
+     * @return
+     */
+    private boolean common${className}(${className} ${classname}) {
+        boolean count = false;
+        Map<String, Object> variables = new HashMap<String, Object>();
+        if (WorkFlowState.SAVE.getValue().equals(${classname}.getState())){
+            // 启动流程
+            count = ${classname}Service.updateAndAttachmentStartWorkFlow(this
+                            .getSessionUser().getId(), ${classname}, attachmentList,
+                    WorkFlowConstant.RCPROCESS, variables);
+        }
+        //设置流程记录信息
+        ApprovalRecord approvalRecord = setApprovalRecord(${classname}.getId());
+        // 流程自动流转到下一步
+        // 更新信息
+		${classname}.setState(WorkFlowState.SUBMIT.getValue());
+        variables.put("isTrue", true);
+        variables.put("title", "XXXXX" + "-" + "XXXX" + "("XXXXXX")的申请需要审批！");
+        variables.put("linkUrl", "${mainPath}/${classname}/approval/" +${classname}.getId());
+        variables.put("SZYDorgCode", this.getSessionUser().getOrgCode());
+        count = ${classname}Service.updateAndApprovalComplete(${classname},
+                approvalRecord, variables, attachmentList);
+
+        return count;
+    }
+
+    private ApprovalRecord setApprovalRecord(String id) {
+        // 机构提交申请
+        User user = this.getSessionUser();
+        ApprovalRecord approvalRecord = new ApprovalRecord();
+        approvalRecord.setTableobjid(id);
+        approvalRecord.setApproverid(user.getId());
+        approvalRecord.setApprover(user.getRealname());
+        approvalRecord.setApprovalcomments("XXXXXX提交了申请!");
+        approvalRecord.setApprovaldate(DateUtil.getDate(new Date()));
+        approvalRecord.setApprovaldeptid(user.getOrganizationId());
+        approvalRecord.setApprovaldept(user.getOrgName());
+        return approvalRecord;
+    }
+
+    @RequiresPermissions("${mainPath}:${classname}:create")
+    @PreventDuplicateSubmission(needSaveToken = true)
+    @RequestMapping(value = "/create", method = RequestMethod.GET)
+    public String create(ModelMap modelMap) {
+        ${className} ${classname} =new ${className}();
+        modelMap.put("${classname}", ${classname});
+        return "/${mainPath}/${moduleName}/${classname}/create.jsp";
+    }
+
+    @ApiOperation(value = "${comments}保存", notes = "信息保存和提交功能")
+    @ApiImplicitParam(name = "${classname}", value = "${comments}实体${classname}", required = true, dataType = "${className}")
+    @RequiresPermissions("${mainPath}:${classname}:create")
+    @PreventDuplicateSubmission(needRemoveToken = true)
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @ResponseBody
+    public Object create(${className} ${classname}, HttpServletRequest request) {
+        boolean count = false;
+        if (WorkFlowState.SUBMIT.getValue().equals(
+            ${classname}.getActionType())){
+            // 如果点击提交 流程启动
+			${classname}.setState(WorkFlowState.SUBMIT.getValue());
+            Map<String, Object> variables = new HashMap<String, Object>();
+            count = ${classname}Service.insertAndAttachmentStartWorkFlow(this
+                            .getSessionUser().getId(), ${classname}, attachmentList,
+                    WorkFlowConstant.RCPROCESS, variables);
+            //设置流程记录信息
+            ApprovalRecord approvalRecord = setApprovalRecord(${classname}.getId());
+            // 下一步
+            variables.put("isTrue", true);
+            variables.put("title", "XXXXX" + "-" + "XXXX" + "("XXXXXX")的申请需要审批！");
+            variables.put("linkUrl", "${mainPath}/${classname}/approval/" +${classname}.getId());
+            variables.put("SZYDorgCode", this.getSessionUser().getOrgCode());
+            count = ${classname}Service.updateAndApprovalComplete(
+                ${classname}, approvalRecord, variables);
+            if (!count) {
+                request.setAttribute("isSuccess", "true");
+                return renderError("${comments}提交失败！");
+            }
+            return renderSuccess("${comments}提交成功！");
+        } else{
+			${classname}.setState(WorkFlowState.SAVE.getValue());
+			${classname}.setStateworkflow("未提交");
+            count = ${classname}Service.insertAndAttachment(${classname},
+                    attachmentList);
+        }
+        if (!count) {
+            request.setAttribute("isSuccess", "true");
+            return renderError("${comments}保存失败！");
+        }
+        return renderSuccess("${comments}保存成功！");
+    }
+
+    /**
+     * 跳转审批页面
+     *
+     * @param modelMap
+     * @param id
+     * @return
+     */
+    @RequiresPermissions("${mainPath}:${classname}:approval")
+    @PreventDuplicateSubmission(needSaveToken = true)
+    @RequestMapping(value = "/approval/{id}", method = RequestMethod.GET)
+    public String approval(ModelMap modelMap, @PathVariable("id") String id) {
+        ${className} ${classname} =${classname}Service.selectById(id);
+        modelMap.put("${classname}", ${classname});
+        modelMap.put("user", getSessionUser());
+        return "/${mainPath}/${moduleName}/${classname}/approval.jsp";
+    }
+
+    @ApiOperation(value = "${comments}审批", notes = "")
+    @ApiImplicitParam(name = "${classname}", value = "${classname}", required = true, dataType = "${className}")
+    @RequiresPermissions("${mainPath}:${classname}:approval")
+    @PreventDuplicateSubmission(needRemoveToken = true)
+    @RequestMapping(value = "/approval", method = RequestMethod.POST)
+    @ResponseBody
+    public Object approval(${className} ${classname}, String zjly,
+                                                      HttpServletRequest request) {
+        boolean count = false;
+        Map<String, Object> variables = new HashMap<String, Object>();
+        if (StateConstant.NOT_COMMITTED.equals(${classname}.getApprovalRecord()
+                .getApprovalresult())){
+            variables.put("isTrue", false);
+        } else{
+            variables.put("isTrue", true);
+        }
+        variables.put("title", "XXXXX" + "-" + "XXXX" + "("XXXXXX")的申请需要审批！");
+        variables.put("linkUrl", "${mainPath}/${classname}/approval/" +${classname}.getId());
+        variables.put("SZYDorgCode", this.getSessionUser().getOrgCode());
+        count = ${classname}Service.updateAndApprovalComplete(
+                new ${className}(), ${classname}.getApprovalRecord(), variables);
+        if (!count) {
+            request.setAttribute("isSuccess", "true");
+            return renderError("${comments}提交失败！");
+        }
+        return renderSuccess("${comments}提交成功！");
+    }
+
+    @ApiImplicitParam(name = "id", value = "${comments}ID", required = true, dataType = "String")
+    @RequiresPermissions("${mainPath}:${classname}:update")
+    @PreventDuplicateSubmission(needSaveToken = true)
+    @RequestMapping(value = "/update/{id}", method = RequestMethod.GET)
+    public String update(@PathVariable("id") String id, ModelMap modelMap) {
+        ${className} ${classname} =${classname}Service.selectById(id);
+        modelMap.put("${classname}", ${classname});
+        return "/${mainPath}/${moduleName}/${classname}/create.jsp";
+    }
+
+    @ApiOperation(value = "${comments}修改", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "${comments}ID", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "${classname}", value = "${comments}实体${classname}", required = true, dataType = "${className}")
+    })
+    @RequiresPermissions("${mainPath}:${classname}:update")
+    @PreventDuplicateSubmission(needRemoveToken = true)
+    @RequestMapping(value = "/update/{id}", method = RequestMethod.POST)
+    @ResponseBody
+    public Object update(@PathVariable("id") String id,
+        ${className} ${classname}, HttpServletRequest request) {
+		${classname}.setId(id);
+        boolean count = false;
+        // 如果点击提交 流程启动
+        if (WorkFlowState.SUBMIT.getValue().equals(
+            ${classname}.getActionType())){
+            // 调用公用执行业务方法
+            count = common${className}(${classname});
+            if (!count) {
+                request.setAttribute("isSuccess", "true");
+                return renderError("${comments}提交失败！");
+            }
+            return renderSuccess("${comments}提交成功！");
+        } else{
+            count = ${classname}Service.updateAndAttachment(${classname},
+                    attachmentList);
+        }
+        if (!count) {
+            request.setAttribute("isSuccess", "true");
+            return renderError("${comments}保存失败！");
+        }
+        return renderSuccess("${comments}保存成功！");
+    }
+
+    @ApiOperation(value = "${comments}提交", notes = "${comments}列表上的信息单条提交")
+    @ApiImplicitParam(name = "id", value = "${comments}ID", required = true, dataType = "String")
+    @RequiresPermissions("${mainPath}:${classname}:referred")
+    @RequestMapping(value = "/referred/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public Object referred(@PathVariable("id") String id,
+                           HttpServletRequest request) {
+        ${className} ${classname} =${classname}Service.selectById(id);
+        boolean count = false;
+        // 调用公用执行业务方法
+        count = common${className}(${classname});
+        if (!count) {
+            request.setAttribute("isSuccess", "true");
+            return renderError("${comments}提交失败！");
+        }
+        return renderSuccess("${comments}提交成功！");
+
+    }
+
+    @ApiOperation(value = "删除${comments}", notes = "")
+    @ApiImplicitParam(name = "ids", value = "${comments}IDS", required = true, dataType = "String")
+    @RequiresPermissions("${mainPath}:${classname}:delete")
+    @RequestMapping(value = "/delete/{ids}", method = RequestMethod.GET)
+    @ResponseBody
+    public Object delete(@PathVariable("ids") String ids) {
+        String idList[] = ids.split("@@");
+        boolean count = false;
+        if (idList.length > 1) {
+            // 删除信息并删除流程
+            count = ${classname}Service
+                    .deleteBatchIdsAndAttachmentAndWorkFlow(
+                            Arrays.asList(idList[0].split("-")),
+                            Arrays.asList(idList[1].split("-")));
+        } else {
+            count = ${classname}Service.deleteBatchIdsAndAttachment(Arrays
+                    .asList(idList[0].split("-")));
+        }
+        if (!count) {
+            return renderError("${comments}删除失败！");
+        }
+        return renderSuccess("${comments}删除成功！");
+    }
+
+    @ApiOperation(value = "${comments}查看", notes = "")
+    @ApiImplicitParam(name = "id", value = "${comments}ID", required = true, dataType = "String")
+    @RequiresPermissions("${mainPath}:${classname}:show")
+    @RequestMapping(value = "/show/{id}", method = RequestMethod.GET)
+    public String show(@PathVariable("id") String id, ModelMap modelMap) {
+        ${className} ${classname} =${classname}Service.selectById(id);
+        modelMap.put("${classname}", ${classname});
+        return "/${mainPath}/${moduleName}/${classname}/show.jsp";
+    }
+
+    @RequestMapping(value = "/findField", method = RequestMethod.GET)
+    public String findField(String path, ModelMap modelMap) throws Exception {
+        // 获取实体需要导入的字段
+        Map<String, String> fieldInfo = PoiPublicUtil
+                .getClassFieldsExcel(${className}. class);
+        modelMap.put("fieldInfo", fieldInfo);
+        // 获取excel字段
+        ImportParams params = new ImportParams();
+        params.setHeadRows(0);
+        List<String> excelList = new ArrayList<>();
+        excelList = PoiPublicUtil.getTitleMap(path, params);
+        modelMap.put("excelList", excelList);
+
+        return "/common/impExp/importField.jsp";
+    }
+
+    @ApiOperation(value = "${comments}执行导入", notes = "")
+    @RequestMapping(value = "/insertImport", method = {RequestMethod.POST})
+    @ResponseBody
+    public Object insertImport(HttpServletRequest request) throws Exception {
+        if (null == request.getParameter("path")) {
+            return renderError("请上传导入的文件！");
+        }
+        ImportParams params = new ImportParams();
+        params.setNeedVerfiy(true);//数据据验证
+        ExcelImportResult<${className}> impResult = ExcelImportUtil
+                .importExcelMore(new File(request.getParameter("path")), ${className}. class,params);
+        boolean isTrue = ${classname}Service.insertBatchExcel(impResult);
+        if (!isTrue) {
+            return renderError("${comments}导入失败！");
+        }
+        return renderSuccess("${comments}导入成功！");
+    }
+
+    @RequestMapping(value = "/exportForward", method = {RequestMethod.GET,
+            RequestMethod.POST})
+    public String exportForward(ModelMap modelMap) {
+        Map<String, String> fieldInfo = PoiPublicUtil
+                .getClassFieldsExcel(${className}. class);
+        modelMap.put("fieldInfo", fieldInfo);
+        return "/common/impExp/exportForward.jsp";
+    }
+
+    @ApiOperation(value = "${comments}导出并下载", notes = "")
+    @RequestMapping(value = "/export${className}", method = {RequestMethod.GET})
+    @ResponseBody
+    public ResponseEntity<byte[]> export${className}(ModelMap modelMap,
+                                                     @ModelAttribute PageResponse page, HttpServletRequest request) {
+        EntityWrapper<${className}> entityWrapper = new EntityWrapper<${className}>();
+        //查询沟选的还是所有数据
+        if (null != page.getItemIds() && !"".equals(page.getItemIds())) {
+            entityWrapper.in("id", Arrays.asList(page.getItemIds().split(",")));
+        } else {
+            entityWrapper = getParameter(page, entityWrapper, request);
+            entityWrapper = searchParams(page, entityWrapper);
+        }
+        List<${className}> list = new ArrayList<${className}>();
+        list = ${classname}Service.selectList(entityWrapper);
+        ExportParams expParams = new ExportParams(null, "${comments}");
+        expParams.setAddIndex(true);//添加序列
+        expParams.setExclusions(page.getFieldIds().split(","));//设置过滤列
+        return getResponseEntity("${comments}.xls", export(expParams, list, ${className}. class),request);
+    }
+
+    @ApiOperation(value = "${comments}word导出并下载", notes = "")
+    @RequestMapping(value = "/expWord/{id}", method = {RequestMethod.GET})
+    @ResponseBody
+    public ResponseEntity<byte[]> word${className}(@PathVariable("id") String id, HttpServletRequest request) {
+        ${className} ${classname} =${classname}Service.selectById(id);
+        return exportWord("word\\\\${classname}\\\\${classname}.docx", "${comments}.docx",${classname}.get${className}Map(),
+        request);
+    }
+}

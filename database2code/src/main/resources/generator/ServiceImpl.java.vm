@@ -1,0 +1,21 @@
+package
+
+    ${package}.${moduleName}.service.impl;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ${package}.${moduleName}.mapper.${className}Mapper;
+import ${package}.${moduleName}.model.${className};
+import ${package}.${moduleName}.service.I${className}Service;
+
+import org.zhuo.${mainPath}.core.common.base.CommonServiceImpl;
+import com.xjs.common.annotation.BaseService;
+
+
+@Service
+
+@Transactional
+public class ${className}ServiceImpl extends CommonServiceImpl<${className}Mapper, ${className}> implements I${className}Service {
+
+}

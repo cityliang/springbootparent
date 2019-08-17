@@ -1,0 +1,162 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	trimDirectiveWhitespaces="true" pageEncoding="UTF-8"%>
+<%@ include file="/resources/inc/other1.jsp"%>
+<section class="content">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<div class="box-body">
+				 <div id="toolbar">
+						<shiro:hasPermission name="${mainPath}:${classname}:create">
+							<a href="#" class="btn btn-info" onclick="createAction()"><span class="glyphicon glyphicon-plus"></span> 新增</a>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="${mainPath}:${classname}:delete">
+							<a href="#" class="btn btn-info" onclick="deleteAction()"><span class="glyphicon glyphicon-remove"></span> 删除</a>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="impAndExpCommon:imp:imp">
+							<a href="#" class="btn btn-info" onclick="impCommon()"><span class="fa fa-file-excel-o"></span> 导入</a>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="impAndExpCommon:exp:exp">
+							<a href="#" class="btn btn-info" onclick="expCommon()"><span class="fa fa-file-excel-o"></span> 导出</a>
+						</shiro:hasPermission>
+				</div>
+					<table id="table" style="margin-top: 0!important;">
+					</table>
+					<!--高级查询-->
+					<div class="box box-primary gaoji senior">
+						<form class="fulltextsearch form-horizontal" id="searchform">
+							#foreach($column in $columns)
+    #if($column.columnName != $pk.columnName)
+									<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+									<div class="form-group">
+										<label class="control-label col-sm-4 col-md-4">${column.comments}</label>
+										<div class="col-sm-8 col-md-8">
+											<input type="text" class="form-control" id="${column.attrname}" name="search-LIKES-${column.attrname}" placeholder="请输入${column.comments}"/>
+										</div>
+									</div>
+								</div>
+							#end
+#end
+						  <div class="row">
+								<div class="col-xs-12">
+									<div class="text-right" style="margin-bottom:20px;margin-right:10px">
+										<button type="button" class="btn btn-danger btn-sm closedrop" onclick="closedrop()"><i class="fa fa-close"></i> 关闭</button>
+										<button type="button" class="btn btn-primary btn-sm closedrop" onclick="searchRest()"><i class="fa fa-close"></i> 清空</button>
+										<button type="button" class="btn btn-primary btn-sm retrieval" onclick="doSearch()"><i class="fa fa-search"></i>  检索</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<script>
+	var $table = $('#table');
+	var url ="${basePath}/${mainPath}/${classname}/list";
+	var insertImport="${basepath}/${mainPath}/${classname}/insertImport";//执行导入功能url
+	var findField="${basepath}/${mainPath}/${classname}/findField";//跳转到导入页面url
+	var exportForward="${basepath}/${mainPath}/${classname}/export${className}";//导出url
+	$("#h1M").html("${comments}");//动态变更标题
+	// 要循环字段所以注释掉下面包含代码，因为下面代码不可以循环遍历字段
+	#include("generator/table.vm")
+##	#include("generator/table1.vm")
+##	#foreach($column in $columns)
+##		#if($column.columnName != $pk.columnName)
+##			{field: '${column.attrname}', title: '${column.comments}',formatter :'${column.attrname}Formatter'},
+##		#end
+##	#end
+##	#include("generator/table2.vm")
+
+	function queryParams(params){
+		var search = {};
+		params.parameter=params.search;
+		search['search-RLIKES-orgCode']=$("#orgCode").val();
+		params.search=JSON.stringify(search);
+		return params;
+	}
+	// 下面代码是为时间字段 绑定插件 因为生成全部字段所以要把不是时间的字段去除
+	layui.use('laydate', function () {
+        var laydate = layui.laydate;
+        //执行一个laydate实例
+        #foreach($column in $columns)
+    #if($column.columnName != $pk.columnName)
+				laydate.render({elem: '#${column.attrname}', range: true, trigger: 'click', type: 'datetime'});
+			#end
+#end
+		// range: true 选择时间范围  type: 'datetime' data 只有日期  datatime 日期和时分秒
+		//laydate.render({elem: '#ppfjoindate', range: true, trigger: 'click', type: 'datetime'});
+    });
+
+    #foreach($column in $columns)
+    #if($column.columnName != $pk.columnName)
+				function ${column.attrname}Formatter(value, row, index) { if (null == value) { return ""; } return value; }
+			#end
+#end
+
+	function timeFormatter(value, row, index) {
+        return changeDateFormat(value);
+    }
+
+    //转换日期格式(时间戳转换为datetime格式)
+    function changeDateFormat(cellval) {
+        var dateVal = cellval + "";
+        if (cellval != null) {
+            var date = new Date(parseInt(dateVal.replace("/Date(", "").replace(")/", ""), 10));
+            var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+            var currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+            var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+            var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+            var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+            // return date.getFullYear() + "-" + month + "-" + currentDate;
+            return date.getFullYear() + "-" + month + "-" + currentDate + " " + hours + ":" + minutes + ":" + seconds;
+        }
+    }
+
+	// 格式化操作按钮
+	function actionFormatter(value, row, index) {
+		return "<shiro:hasPermission name='${mainPath}:${classname}:show'><a href='javascript:;' onclick=showAction('"+ row.id +"') data-toggle='tooltip' title='查看'><i class='glyphicon glyphicon-search'></i></a></shiro:hasPermission>&nbsp;&nbsp;&nbsp;"+
+		"<shiro:hasPermission name='${mainPath}:${classname}:update'><a href='javascript:;' onclick=updateAction('"+ row.id +"') data-toggle='tooltip' title='修改'><i class='glyphicon glyphicon-edit'></i></a></shiro:hasPermission>&nbsp;&nbsp;&nbsp;"+
+		"<shiro:hasPermission name='${mainPath}:${classname}:word'><a href='javascript:;' onclick=wordAction('"+ row.id +"') data-toggle='tooltip' title='word导出'><i class='fa fa-file-word-o'></i></a></shiro:hasPermission>&nbsp;&nbsp;&nbsp;"+
+		"<shiro:hasPermission name='${mainPath}:${classname}:delete'><a href='javascript:;' onclick=deleteAction('"+ row.id +"') data-toggle='tooltip' title='删除'><i class='glyphicon glyphicon-remove'></i></a></shiro:hasPermission>";
+	}
+	//提示格式化
+	function tooltipFormatter(value, row, index){
+		if(null == value){
+			return "";
+		}
+		return "<span title='"+ value +"'>" + value +"</span>";
+	}
+	//查看
+	function viewFormatter(value, row, index){
+		return "<a class='form-view' href='javascript:;' onclick=showAction('"+row.id+"') title='"+value+"'>"+value+"</a>";
+	}
+	function createAction(){
+		toCommon('${basepath}/${mainPath}/${classname}/create');
+	}
+
+	function deleteAction(id){
+		confirmCommon("确认删除${comments}吗？",'${basepath}/${mainPath}/${classname}/delete',id);
+	}
+	function updateAction(id){
+		toCommon('${basepath}/${mainPath}/${classname}/update/'+id);
+	}
+	//双击表格查看
+	function onDblClickRow(row){
+		showAction(row.id);
+	}
+	function showAction(id){
+		toCommon('${basepath}/${mainPath}/${classname}/show/'+id);
+	}
+	function impCommon(){
+		toCommon('${basepath}/${mainPath}/impExp/toImport');
+	}
+	function expCommon(){
+		toCommon('${basepath}/${mainPath}/${classname}/exportForward');
+	}
+	function wordAction(id){
+		oneDataCommon("${basepath}/${mainPath}/${classname}/expWord",id);
+	}
+</script>
