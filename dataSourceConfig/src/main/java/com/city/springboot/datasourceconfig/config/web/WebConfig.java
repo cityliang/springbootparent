@@ -1,4 +1,4 @@
-package com.city.sprinbboot.database2code.config.web;
+package com.city.springboot.datasourceconfig.config.web;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;

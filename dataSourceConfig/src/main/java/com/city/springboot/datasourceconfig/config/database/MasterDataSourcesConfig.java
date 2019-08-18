@@ -1,4 +1,4 @@
-package com.city.sprinbboot.database2code.config.database;
+package com.city.springboot.datasourceconfig.config.database;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;

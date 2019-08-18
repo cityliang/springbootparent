@@ -1,10 +1,10 @@
-package com.city.sprinbboot.database2code.config.mybatis;
+package com.city.springboot.datasourceconfig.config.mybatis;
 
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.PerformanceInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.PerformanceInterceptor;
 
 /**
  *  MybatisPlus 相关配置
