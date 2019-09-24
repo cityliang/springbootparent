@@ -38,7 +38,7 @@ import com.baomidou.mybatisplus.enums.SqlLike;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.xjs.common.date.DateUtil;
-import com.xjs.common.entity.User;
+import com.xjs.common.entity.com.test.User;
 import com.xjs.common.impExp.excel.ExcelImportUtil;
 import com.xjs.common.impExp.excel.entity.ExportParams;
 import com.xjs.common.impExp.excel.entity.ImportParams;
@@ -178,7 +178,7 @@ public class ${className}Controller extends CdpfMisBaseController<${className}> 
 
     private ApprovalRecord setApprovalRecord(String id) {
         // 机构提交申请
-        User user = this.getSessionUser();
+        com.test.User user = this.getSessionUser();
         ApprovalRecord approvalRecord = new ApprovalRecord();
         approvalRecord.setTableobjid(id);
         approvalRecord.setApproverid(user.getId());

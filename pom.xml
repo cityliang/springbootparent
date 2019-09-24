@@ -25,6 +25,8 @@
 	<modules>
 		<module>database2code</module>
 		<module>dataSourceConfig</module>
+		<module>Test</module>
+		<module>spirngboot-webservice</module>
 	</modules>
     <!-- 依赖统一版本管理 -->
 	<dependencyManagement>
